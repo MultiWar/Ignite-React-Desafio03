@@ -57,6 +57,7 @@ export default function Home({ postsPagination: { next_page, results } }: HomePr
     setNextPageLink(rawPosts.next_page)
     setPosts(current => [...current, ...newPosts])
   }
+  
   // TODO
   return (
     <>
@@ -70,8 +71,8 @@ export default function Home({ postsPagination: { next_page, results } }: HomePr
               <h2>{post.data.title}</h2>
               <p>{post.data.subtitle}</p>
               <div>
-                <div><FiCalendar /><span>{post.first_publication_date}</span></div>
-                <div><FiUser /><span>{post.data.author}</span></div>
+                <div><FiCalendar />{format(new Date(post.first_publication_date), 'dd MMM u', {locale: ptBR})}</div>
+                <div><FiUser />{post.data.author}</div>
               </div>
             </a>
           </Link>
@@ -99,7 +100,7 @@ export const getStaticProps: GetStaticProps = async () => {
         subtitle: post.data.subtitle,
         author: post.data.author,
       },
-      first_publication_date: format(new Date(post.first_publication_date), 'dd MMM u', {locale: ptBR})
+      first_publication_date: post.first_publication_date
     }
   })
 

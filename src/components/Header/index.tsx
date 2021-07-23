@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 import styles from './header.module.scss'
 
 export default function Header() {
-  const { asPath } = useRouter()
-  const alternativeClass = asPath === '/' ? styles.alternative : ''
+  const router = useRouter()
+  const alternativeClass = router?.asPath === '/' ? styles.alternative : ''
   // TODO
   return (
     <header className={`${styles.headerContent} ${alternativeClass}`}>

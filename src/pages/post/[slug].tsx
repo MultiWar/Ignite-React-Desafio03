@@ -10,6 +10,8 @@ import { RichText } from 'prismic-dom';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Fragment } from 'react';
+import { useRouter } from 'next/router';
 
 interface Post {
   first_publication_date: string | null;
@@ -35,6 +37,7 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   // TODO
   const readingTime = calculateReadingTime()
+  const { isFallback } = useRouter()
 
   function calculateReadingTime () {
     const readingSpeed = 200; // average person's words per minute reading speed
@@ -50,6 +53,12 @@ export default function Post({ post }: PostProps) {
     return Math.ceil(words / readingSpeed)
   }
 
+  if(isFallback) {
+    return (
+      <h1>Carregando...</h1>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -62,17 +71,17 @@ export default function Post({ post }: PostProps) {
         <header>
           <h1>{post.data.title}</h1>
           <div>
-            <span><FiCalendar /> {post.first_publication_date}</span>
+            <span><FiCalendar /> {format(new Date(post.first_publication_date), 'dd MMM u', { locale: ptBR })}</span>
             <span><FiUser /> {post.data.author}</span>
             <span><FiClock /> {readingTime} min</span>
           </div>
         </header>
         <main className={styles.main}>
           {post.data.content.map(cont => (
-            <>
+            <Fragment key={cont.heading}>
               <h2>{cont.heading}</h2>
               <div dangerouslySetInnerHTML={{__html: RichText.asHtml(cont.body)}} />
-            </>
+            </Fragment>
           ))}
         </main>
       </article>
@@ -87,11 +96,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
   ], { pageSize: 1 });
 
   return {
-    paths: [
-      { params: {
-        slug: posts.results[0].uid
-      } },
-    ],
+    paths: posts.results.map(post => {
+      return {
+         params: {
+          slug: post.uid
+        }
+      }
+    }),
     fallback: true
   }
 
@@ -105,9 +116,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const response = await prismic.getByUID('post', String(slug), {});
 
   const post = {
-    first_publication_date: format(new Date(response.first_publication_date), 'dd MMM u', { locale: ptBR }),
+    first_publication_date: response.first_publication_date,
     data: {
       title: response.data.title,
+      subtitle: response.data.subtitle,
       banner: {
         url: response.data.banner.url,
       },
@@ -119,6 +131,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         }
       }),
     },
+    uid: response.uid
   }
 
   return {
