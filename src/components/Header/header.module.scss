@@ -1,1 +1,12 @@
 // TODO
+.headerContent {
+    height: 6.625rem;
+    width: 700px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+
+    &.alternative {
+        margin: 2rem auto;
+    }
+}

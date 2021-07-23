@@ -5,3 +5,36 @@
 }
 
 // TODO
+
+:root {
+  --accent-color: #FF57B2;
+  --heading-color: #F8F8F8;
+  --background-color: #1A1D23;
+  --info-color: #BBBBBB;
+  --body-color: #D7D7D7
+}
+
+@media(max-width: 1080px) {
+  html {
+    font-size: 93.75%;
+  }
+}
+
+@media(max-width: 720px) {
+  html {
+    font-size: 87.5%;
+  }
+}
+
+h1, h2, h3, p, a, span, button, ul, ol, textarea {
+  font-family: Inter, sans-serif;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}

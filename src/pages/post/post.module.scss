@@ -1,1 +1,83 @@
 // TODO
+.banner {
+    width: 100vw;
+    height: 25rem;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+    }
+}
+
+.article {
+    padding: 5rem 0;
+
+    h1, h2 {
+        color: var(--heading-color);
+        font-weight: 700;
+    }
+
+    p, ul {
+        color: var(--body-color);
+    }
+
+    a {
+        color: var(--accent-color);
+        text-decoration: none;
+    }
+
+    span {
+        color: var(--info-color);
+    }
+
+    header {
+        h1 {
+            font-size: 3rem;
+            line-height: 3.625rem;
+        }
+
+        div {
+            margin-top: 1.5625rem;
+            display: flex;
+            gap: 1rem;
+
+            span {
+                font-size: 0.875rem;
+                line-height: 1.0625rem;
+                display: inline-block;
+    
+                svg {
+                    margin-right: 0.625rem;
+                    stroke: var(--info-color);
+                    transform: translateY(10%);
+                }
+            }
+        }
+    }
+}
+
+.main {
+    h2 {
+        margin-top: 4.125rem;
+        font-size: 2.25rem;
+    }
+
+    strong {
+        font-weight: 700;
+    }
+
+    p, ul, strong, em, i, a {
+        font-size: 1.125rem;
+        text-align: justify;
+        line-height: 1.5625rem;
+    }
+
+    p:first-child {
+        margin-top: 4rem;
+    }
+
+    ul {
+        margin: 1rem 0 1rem 2.5rem;
+    }
+
+}
