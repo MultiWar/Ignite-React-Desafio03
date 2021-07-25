@@ -34,12 +34,9 @@
             gap: 0.625rem;
             align-items: center;
             white-space: nowrap;
-            
-            span {
-                color: var(--info-color);
-                font-size: 0.875rem;
-                line-height: 1.0625;
-            }
+            color: var(--info-color);
+            font-size: 0.875rem;
+            line-height: 1.0625;
 
             > svg {
                 stroke: var(--info-color);

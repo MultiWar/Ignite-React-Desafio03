@@ -53,6 +53,17 @@
                 }
             }
         }
+
+        > span:last-child {
+            display: inline-block;
+            margin-top: 1.125rem;
+        }
+    }
+
+    footer {
+        border-top: 1px solid rgba(215, 215, 215, 0.1);
+        margin-top: 3.75rem;
+        padding-top: 3rem;
     }
 }
 
@@ -80,4 +91,34 @@
         margin: 1rem 0 1rem 2.5rem;
     }
 
+}
+
+.adjacentPosts {
+    width: 100%;
+    margin-bottom: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+        'previous next';
+
+    > div {
+        p {
+            margin-bottom: .5rem;
+            font-size: 1.125rem;
+        }
+
+        a {
+            font-weight: 600;
+        }
+    }
+
+    .previous {
+        grid-area: previous;
+        text-align: left;
+    }
+
+    .next {
+        grid-area: next;
+        text-align: right;
+    }
 }

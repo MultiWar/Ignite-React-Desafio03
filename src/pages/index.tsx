@@ -29,9 +29,10 @@ interface PostPagination {
 
 interface HomeProps {
   postsPagination: PostPagination;
+  preview: boolean
 }
 
-export default function Home({ postsPagination: { next_page, results } }: HomeProps) {
+export default function Home({ postsPagination: { next_page, results }, preview }: HomeProps) {
   const [nextPageLink, setNextPageLink] = useState<string | null>(next_page)
   const [posts, setPosts] = useState(results)
 
@@ -71,25 +72,34 @@ export default function Home({ postsPagination: { next_page, results } }: HomePr
               <h2>{post.data.title}</h2>
               <p>{post.data.subtitle}</p>
               <div>
-                <div><FiCalendar />{format(new Date(post.first_publication_date), 'dd MMM u', {locale: ptBR})}</div>
+                <div><FiCalendar />{post.first_publication_date}</div>
                 <div><FiUser />{post.data.author}</div>
               </div>
             </a>
           </Link>
         ))}
         {nextPageLink && <button className={styles.loadMore} onClick={loadMore}>Carregar mais posts</button>}
+        {preview && (
+            <footer>
+              <Link href='/api/exit-preview'>
+                <a>Sair do modo de preview</a>
+              </Link>
+            </footer>
+        )}
       </main>
     </>
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<HomeProps> = async ({preview = false, previewData}) => {
   const prismic = getPrismicClient();
+
   const postsResponse = await prismic.query([
     Prismic.predicates.at('document.type', 'post')
   ], {
     fetch: ['post.title', 'post.subtitle', 'post.author'],
-    pageSize: 1
+    pageSize: 1,
+    ref: previewData?.ref ?? null
   });
 
   const posts = postsResponse.results.map(post => {
@@ -100,7 +110,7 @@ export const getStaticProps: GetStaticProps = async () => {
         subtitle: post.data.subtitle,
         author: post.data.author,
       },
-      first_publication_date: post.first_publication_date
+      first_publication_date: format(new Date(post.first_publication_date), 'dd MMM u', {locale: ptBR})
     }
   })
 
@@ -109,7 +119,8 @@ export const getStaticProps: GetStaticProps = async () => {
       postsPagination: {
         results: posts,
         next_page: postsResponse.next_page
-      }
+      },
+      preview
     }
   }
 

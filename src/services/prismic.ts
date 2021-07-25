@@ -9,3 +9,15 @@ export function getPrismicClient(req?: unknown): DefaultClient {
 
   return prismic;
 }
+
+interface doc {
+  type: string,
+  uid: string
+}
+
+export const linkResolver = (doc: doc) => {
+  if(doc.type === 'post') {
+    return `/post/${doc.uid}`
+  }
+  return '/'
+}

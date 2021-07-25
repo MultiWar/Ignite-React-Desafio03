@@ -12,9 +12,16 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Fragment } from 'react';
 import { useRouter } from 'next/router';
+import { Comments } from '../../components/Comments';
+import Link from 'next/link';
+import { useAdjacentPosts } from '../../hooks/useAdjacentPosts';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: {
+    day: string | null,
+    time: string | null,
+  };
   data: {
     title: string;
     banner: {
@@ -30,11 +37,25 @@ interface Post {
   };
 }
 
-interface PostProps {
-  post: Post;
+interface AdjPost {
+  uid: string,
+  data: {
+    title: string
+  }
 }
 
-export default function Post({ post }: PostProps) {
+interface AdjacentPosts {
+  nextPost: AdjPost,
+  previousPost: AdjPost
+}
+
+interface PostProps {
+  post: Post;
+  preview: boolean,
+  adjacentPosts: AdjacentPosts
+}
+
+export default function Post({ post, preview, adjacentPosts }: PostProps) {
   // TODO
   const readingTime = calculateReadingTime()
   const { isFallback } = useRouter()
@@ -71,10 +92,14 @@ export default function Post({ post }: PostProps) {
         <header>
           <h1>{post.data.title}</h1>
           <div>
-            <span><FiCalendar /> {format(new Date(post.first_publication_date), 'dd MMM u', { locale: ptBR })}</span>
+            <span><FiCalendar /> {post.first_publication_date}</span>
             <span><FiUser /> {post.data.author}</span>
             <span><FiClock /> {readingTime} min</span>
           </div>
+          {post.last_publication_date && 
+            post.last_publication_date.day !== post.first_publication_date && (
+              <span><em>* editado em {post.last_publication_date.day}, às {post.last_publication_date.time}</em></span>
+          )}
         </header>
         <main className={styles.main}>
           {post.data.content.map(cont => (
@@ -84,6 +109,36 @@ export default function Post({ post }: PostProps) {
             </Fragment>
           ))}
         </main>
+        <footer>
+          <section className={styles.adjacentPosts}>
+            {adjacentPosts.previousPost && (
+              <div className={styles.previous}>
+                <p>{adjacentPosts.previousPost.data.title}</p>
+                <Link href={`/post/${adjacentPosts.previousPost.uid}`}>
+                  <a>
+                    Post anterior
+                  </a>
+                </Link>
+              </div>
+            )}
+            {adjacentPosts.nextPost && (
+              <div className={styles.next}>
+                <p>{adjacentPosts.nextPost.data.title}</p>
+                <Link href={`/post/${adjacentPosts.nextPost.uid}`}>
+                  <a>
+                    Próximo post
+                  </a>
+                </Link>
+              </div>
+            )}
+          </section>
+          <Comments />
+          {preview && (
+            <Link href='/api/exit-preview'>
+              <a>Sair do modo de preview</a>
+            </Link>
+          )}
+        </footer>
       </article>
     </>
   )
@@ -109,14 +164,21 @@ export const getStaticPaths: GetStaticPaths = async () => {
   // TODO
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({ params, preview = false, previewData }) => {
   const prismic = getPrismicClient();
   const { slug } = params
+  const adjacentPosts = await useAdjacentPosts(String(slug))
 
-  const response = await prismic.getByUID('post', String(slug), {});
+  const response = await prismic.getByUID('post', String(slug), {
+    ref: previewData?.ref ?? null,
+  });
 
   const post = {
-    first_publication_date: response.first_publication_date,
+    first_publication_date: format(new Date(response.first_publication_date), 'dd MMM u', { locale: ptBR }),
+    last_publication_date: {
+      day: format(new Date(response.last_publication_date), "dd MMM u", { locale: ptBR }),
+      time: format(new Date(response.last_publication_date), "HH:mm", { locale: ptBR }),
+    },
     data: {
       title: response.data.title,
       subtitle: response.data.subtitle,
@@ -136,7 +198,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: {
-      post: post
+      post: post,
+      preview,
+      adjacentPosts
     }
   }
 
